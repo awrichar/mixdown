@@ -1,38 +1,122 @@
-.App {
-  text-align: center;
+@font-face {
+    font-family: AnsleyDisplay;
+    src: url(./Ansley-Display-Bold.ttf);
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+
+.KaleidoLogo {
+    vertical-align: middle;
+    height: 36px;
+    margin-top: -2px;
+    margin-left: .2rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.TitleBox {
+    background: url(./polygon-bg.png);
+    background-position: center;
+    position: relative;
+    width: 100%;
+    height: 500px;
+    box-shadow: inset 0 -2px 5px rgba(0,0,0,.7);
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.Title {
+    display: inline-block;
+    padding-top: 20px;
+    padding-left: 20px;
 }
 
-.App-link {
-  color: #61dafb;
+.Title h1 {
+    color: #fff;
+    font-family: AnsleyDisplay, serif;
+    text-shadow: 5px 5px 0 #ee34a8;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.Title h6 {
+    text-align: right;
+    margin-top: -15px;
+    padding-right: 1rem;
+}
+
+.Subtitle {
+    color: #fff;
+    padding-left: 40px;
+    padding-top: 60px;
+}
+
+.Subtitle h6 {
+    /*font-family: Georgia, 'Times New Roman', Times, serif;*/
+}
+
+.AboutText {
+    padding: 30px 20px;
+}
+
+.AboutText h4 {
+    margin-bottom: 1rem;
+}
+
+.AboutText button {
+    margin: 1rem 10px 5px 0;
+}
+
+.ChartBox {
+    padding: 20px;
+}
+
+.Chart {
+    background: #fff;
+    color: #000;
+    padding: 15px 25px;
+    border-radius: 7px;
+    width: 100%;
+    height: 100%;
+    opacity: 0.9;
+    box-shadow: 0 0 10px #000;
+}
+
+.Chart h4 {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: #333;
+    text-shadow: 1px 1px 1px #ddd;
+}
+
+.Chart ol {
+    counter-reset: chart-counter;
+    padding-left: 0;
+    list-style: none;
+}
+
+.Chart ol li {
+    counter-increment: chart-counter;
+    border-top: 1px solid #bbb;
+    padding: 0 10px 5px 60px;
+    margin-bottom: 5px;
+    position: relative;
+    background: #fff;
+}
+
+.Chart ol li::before {
+    content: counter(chart-counter);
+    color: #fff;
+    font-weight: bold;
+    background: #bbb;
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    width: 50px;
+    height: 100%;
+    line-height: 2.7rem;
+    text-align: center;
+}
+
+.Chart ol li .SongTitle {
+    font-weight: bold;
+    padding-top: 3px;
+}
+
+.Chart button {
+    margin: auto;
+    display: block;
 }
