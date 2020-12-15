@@ -6,9 +6,30 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import KaleidoLogo from './kaleido.svg';
 import './App.css';
+
+const useStyles = makeStyles((theme) => {
+  return {
+    titleBox: {
+      [theme.breakpoints.down('md')]: {
+        height: "275px",
+      },
+      [theme.breakpoints.up('lg')]: {
+        height: "500px",
+      },
+    },
+    title: {
+      [theme.breakpoints.down('md')]: {
+        fontSize: "10vw",
+      },
+      [theme.breakpoints.up('lg')]: {
+        fontSize: "6.25vw",
+      },
+    },
+  };
+})
 
 function Song(props) {
   return (
@@ -38,8 +59,7 @@ function SongList(props) {
 }
 
 export default function App() {
-  const theme = useTheme();
-  const isLarge = useMediaQuery(theme.breakpoints.up('lg'));
+  const styles = useStyles();
 
   const songs = [
     {id: 1, artist: "Betting for Benson", title: "Runaway Girl"},
@@ -51,10 +71,10 @@ export default function App() {
 
   return (
     <Container maxWidth={false} disableGutters>
-      <Grid container className="TitleBox">
+      <Grid container className={`TitleBox ${styles.titleBox}`}>
           <Grid item xs={12} lg={6}>
             <Box className="Title">
-              <Typography variant="h1">
+              <Typography variant="h1" className={styles.title}>
                 Mixdown
               </Typography>
               <Typography variant="h6">
