@@ -13,6 +13,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "node-stream-zip": "^1.8.2",
+    "pg": "^8.5.1",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7"
   },
