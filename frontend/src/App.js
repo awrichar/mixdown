@@ -26,6 +26,14 @@ const styles = theme => ({
       fontSize: "6.25vw",
     },
   },
+  subtitle: {
+    [theme.breakpoints.down('md')]: {
+      paddingTop: "0",
+    },
+    [theme.breakpoints.up('lg')]: {
+      paddingTop: "60px",
+    },
+  },
 });
 
 function Song(props) {
@@ -33,7 +41,10 @@ function Song(props) {
     <li>
       <div className="SongTitle">{props.title}</div>
       <div className="SongArtist">{props.artist}</div>
-      <div className="SongCount">{props.count}</div>
+      <div className="SongCountWrapper">
+        <div className="SongCount">{props.count}</div>
+        <div>{props.count == 1 ? "play" : "plays"}</div>
+      </div>
     </li>
   );
 }
@@ -241,7 +252,7 @@ class App extends React.Component {
                 <img src={KaleidoLogo} alt="Kaleido" className="KaleidoLogo" /></Link>
               </Typography>
             </Box>
-            <Container className="Subtitle">
+            <Container className={`Subtitle ${this.props.classes.subtitle}`}>
               <Typography variant="h6">
                 Live reporting of top songs across multiple streaming services.
               </Typography>

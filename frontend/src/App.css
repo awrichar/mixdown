@@ -42,7 +42,6 @@
 .Subtitle {
     color: #fff;
     padding-left: 40px;
-    padding-top: 60px;
 }
 
 .AboutText {
@@ -110,11 +109,18 @@
     padding-top: 3px;
 }
 
-.Chart ol li .SongCount {
+.Chart ol li .SongCountWrapper {
     position: absolute;
     top: 0;
     right: 0;
+    width: 3rem;
+    text-align: center;
+    padding-top: 3px;
+}
+
+.Chart ol li .SongCount {
     font-size: 2rem;
+    line-height: 90%
 }
 
 .Chart button {
