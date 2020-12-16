@@ -11,6 +11,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
 import { withStyles } from '@material-ui/core/styles';
 import KaleidoLogo from './kaleido.svg';
 import './App.css';
@@ -108,11 +110,59 @@ function ArtistPopup(props) {
   )
 }
 
+function DistributorPopup(props) {
+  const [isrc, setIsrc] = React.useState("");
+
+  const songs = props.songs.map(song =>
+    <option key={song.isrc} value={song.isrc}>{song.artist} - {song.title}</option>
+  );
+
+  const handleChange = event => {
+    setIsrc(event.target.value);
+  };
+
+  const handleSubmit = () => {
+    if (isrc) {
+      props.onSubmit({
+        isrc: isrc,
+      });
+    }
+  };
+
+  return (
+    <Dialog open={props.open} maxWidth="sm" fullWidth>
+      <DialogTitle>For distributors</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Record song plays using this form.
+        </DialogContentText>
+        <form>
+          <FormControl>
+            <Select native onChange={handleChange} initialValue="">
+              <option key="" value=""></option>
+              {songs}
+            </Select>
+          </FormControl>
+          <DialogActions>
+            <Button variant="contained" disableElevation color="secondary" onClick={props.onCancel}>
+              Cancel
+            </Button>
+            <Button variant="contained" disableElevation color="primary" onClick={handleSubmit}>
+              Submit
+            </Button>
+          </DialogActions>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       artistOpen: false,
+      distributorOpen: false,
       songs: [],
     };
   }
@@ -140,6 +190,24 @@ class App extends React.Component {
       });
       if (res.ok) {
         this.setArtistOpen(false);
+        this.fetchTracks();
+      } else {
+        const {error} = await res.json();
+        alert(error)
+      }
+    } catch(err) {
+      alert(err.stack)
+    }
+  }
+
+  async addPlay(data) {
+    try {
+      const res = await fetch(`/api/tracks/${data.isrc}/increment`, {
+        method: 'POST',
+      });
+      if (res.ok) {
+        this.setDistributorOpen(false);
+        this.fetchTracks();
       } else {
         const {error} = await res.json();
         alert(error)
@@ -153,9 +221,15 @@ class App extends React.Component {
     this.setState({ artistOpen: open });
   }
 
+  setDistributorOpen(open) {
+    this.setState({ distributorOpen: open });
+  }
+
   render() {
     const artistOpen = () => { this.setArtistOpen(true); };
     const artistClose = () => { this.setArtistOpen(false); };
+    const distributorOpen = () => { this.setDistributorOpen(true); };
+    const distributorClose = () => { this.setDistributorOpen(false); };
 
     return (
       <Container maxWidth="xl" disableGutters>
@@ -194,7 +268,7 @@ class App extends React.Component {
             <Button variant="contained" color="secondary" size="large" onClick={artistOpen}>
               For artists
             </Button>
-            <Button variant="contained" color="secondary" size="large">
+            <Button variant="contained" color="secondary" size="large" onClick={distributorOpen}>
               For distributors
             </Button>
           </Grid>
@@ -218,6 +292,12 @@ class App extends React.Component {
           open={this.state.artistOpen}
           onCancel={artistClose}
           onSubmit={(data) => this.saveTrack(data)}
+        />
+        <DistributorPopup
+          open={this.state.distributorOpen}
+          songs={this.state.songs}
+          onCancel={distributorClose}
+          onSubmit={(data) => this.addPlay(data)}
         />
       </Container>
     );

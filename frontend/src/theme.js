@@ -34,7 +34,12 @@ const theme = createMuiTheme({
       root: {
         color: '#000',
       }
-    }
+    },
+    MuiSelect: {
+      root: {
+        color: '#000',
+      }
+    },
   },
 });
 
