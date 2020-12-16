@@ -5,15 +5,9 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogActions from '@material-ui/core/DialogActions';
-import TextField from '@material-ui/core/TextField';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import { withStyles } from '@material-ui/core/styles';
+import ArtistPopup from './ArtistPopup';
+import DistributorPopup from './DistributorPopup';
 import KaleidoLogo from './kaleido.svg';
 import './App.css';
 
@@ -62,107 +56,6 @@ function SongList(props) {
       <ol>{songs}</ol>
     </Box>
   );
-}
-
-function ArtistPopupField(props) {
-  const handleChange = event => {
-    props.setter(event.target.value);
-  };
-
-  return (
-    <TextField
-      variant="filled"
-      fullWidth
-      margin="dense"
-      label={props.label}
-      onChange={handleChange}
-    />
-  );
-}
-
-function ArtistPopup(props) {
-  const [isrc, setIsrc] = React.useState("");
-  const [artist, setArtist] = React.useState("");
-  const [title, setTitle] = React.useState("");
-
-  const handleSubmit = () => {
-    props.onSubmit({
-      isrc: isrc,
-      artist: artist,
-      titls: title,
-    });
-  };
-
-  return (
-    <Dialog open={props.open} maxWidth="sm" fullWidth>
-      <DialogTitle>For artists</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          Add a new song by filling out this form.
-        </DialogContentText>
-        <form>
-          <ArtistPopupField label="ISRC" setter={setIsrc} />
-          <ArtistPopupField label="Artist" setter={setArtist} />
-          <ArtistPopupField label="Title" setter={setTitle} />
-          <DialogActions>
-            <Button variant="contained" disableElevation color="secondary" onClick={props.onCancel}>
-              Cancel
-            </Button>
-            <Button variant="contained" disableElevation color="primary" onClick={handleSubmit}>
-              Submit
-            </Button>
-          </DialogActions>
-        </form>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-function DistributorPopup(props) {
-  const [isrc, setIsrc] = React.useState("");
-
-  const songs = props.songs.map(song =>
-    <option key={song.isrc} value={song.isrc}>{song.artist} - {song.title}</option>
-  );
-
-  const handleChange = event => {
-    setIsrc(event.target.value);
-  };
-
-  const handleSubmit = () => {
-    if (isrc) {
-      props.onSubmit({
-        isrc: isrc,
-      });
-    }
-  };
-
-  return (
-    <Dialog open={props.open} maxWidth="sm" fullWidth>
-      <DialogTitle>For distributors</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          Record song plays using this form.
-        </DialogContentText>
-        <form>
-          <FormControl>
-            <Select native onChange={handleChange} initialValue="">
-              <option key="" value=""></option>
-              {songs}
-            </Select>
-          </FormControl>
-          <DialogActions>
-            <Button variant="contained" disableElevation color="secondary" onClick={props.onCancel}>
-              Cancel
-            </Button>
-            <Button variant="contained" disableElevation color="primary" onClick={handleSubmit}>
-              Submit
-            </Button>
-          </DialogActions>
-        </form>
-      </DialogContent>
-    </Dialog>
-  )
 }
 
 class App extends React.Component {
