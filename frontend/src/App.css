@@ -110,6 +110,13 @@
     padding-top: 3px;
 }
 
+.Chart ol li .SongCount {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 2rem;
+}
+
 .Chart button {
     margin: auto;
     display: block;

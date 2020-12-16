@@ -5,37 +5,35 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import KaleidoLogo from './kaleido.svg';
 import './App.css';
 
-const useStyles = makeStyles((theme) => {
-  return {
-    title: {
-      [theme.breakpoints.down('md')]: {
-        fontSize: "10vw",
-      },
-      [theme.breakpoints.up('lg')]: {
-        fontSize: "6.25vw",
-      },
+const styles = theme => ({
+  title: {
+    [theme.breakpoints.down('md')]: {
+      fontSize: "10vw",
     },
-  };
-})
+    [theme.breakpoints.up('lg')]: {
+      fontSize: "6.25vw",
+    },
+  },
+});
 
 function Song(props) {
   return (
     <li>
       <div className="SongTitle">{props.title}</div>
       <div className="SongArtist">{props.artist}</div>
+      <div className="SongCount">{props.count}</div>
     </li>
   );
 }
 
 function SongList(props) {
   const songs = props.songs.map(song =>
-    <Song key={song.id} artist={song.artist} title={song.title} />
-  );
+    <Song key={song.isrc} artist={song.artist} title={song.title} count={song.count} />
+  ).sort((a, b) => b.props.count - a.props.count).slice(0, 5);
 
   return (
     <Box className="Chart">
@@ -50,23 +48,32 @@ function SongList(props) {
   );
 }
 
-export default function App() {
-  const styles = useStyles();
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      songs: [],
+    };
+  }
 
-  const songs = [
-    {id: 1, artist: "Betting for Benson", title: "Runaway Girl"},
-    {id: 2, artist: "Betting for Benson", title: "Blame It On My Heart"},
-    {id: 3, artist: "Betting for Benson", title: "Beautiful Disease"},
-    {id: 4, artist: "Betting for Benson", title: "My Kind of Crazy"},
-    {id: 5, artist: "Betting for Benson", title: "Remembering Amy"},
-  ];
+  async componentDidMount() {
+    this.fetchTracks();
+  }
 
-  return (
-    <Container maxWidth="xl" disableGutters>
-      <Grid container className="TitleBox">
+  async fetchTracks() {
+    const res = await fetch(`/api/tracks`);
+    if (res.ok) {
+      this.setState({ songs: await res.json() });
+    }
+  }
+
+  render() {
+    return (
+      <Container maxWidth="xl" disableGutters>
+        <Grid container className="TitleBox">
           <Grid item xs={12} lg={6}>
             <Box className="Title">
-              <Typography variant="h1" className={styles.title}>
+              <Typography variant="h1" className={this.props.classes.title}>
                 Mixdown
               </Typography>
               <Typography variant="h6">
@@ -81,10 +88,10 @@ export default function App() {
             </Container>
           </Grid>
           <Grid item xs={12} lg={6} className="ChartBox">
-            <SongList songs={songs} />
+            <SongList songs={this.state.songs} />
           </Grid>
-      </Grid>
-      <Grid container>
+        </Grid>
+        <Grid container>
           <Grid item xs={12} lg={6} className="AboutText">
             <Typography variant="h4">
               Stream your tracks. Track your streams.
@@ -117,7 +124,10 @@ export default function App() {
               </Link>.
             </Typography>
           </Grid>
-      </Grid>
-    </Container>
-  );
+        </Grid>
+      </Container>
+    );
+  }
 }
+
+export default withStyles(styles)(App);
