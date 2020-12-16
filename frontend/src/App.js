@@ -49,9 +49,6 @@ function SongList(props) {
         Top Tracks
       </Typography>
       <ol>{songs}</ol>
-      <Button variant="contained" color="primary" size="large">
-        View full chart
-      </Button>
     </Box>
   );
 }
