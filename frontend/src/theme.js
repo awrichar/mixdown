@@ -24,6 +24,18 @@ const theme = createMuiTheme({
     fontFamily: 'Lato, sans-serif',
     fontSize: 16,
   },
+  overrides: {
+    MuiDialogTitle: {
+      root: {
+        color: '#000',
+      }
+    },
+    MuiDialogContent: {
+      root: {
+        color: '#000',
+      }
+    }
+  },
 });
 
 export default theme;

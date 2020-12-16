@@ -5,6 +5,12 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
+import TextField from '@material-ui/core/TextField';
 import { withStyles } from '@material-ui/core/styles';
 import KaleidoLogo from './kaleido.svg';
 import './App.css';
@@ -48,10 +54,65 @@ function SongList(props) {
   );
 }
 
+function ArtistPopupField(props) {
+  const handleChange = event => {
+    props.setter(event.target.value);
+  };
+
+  return (
+    <TextField
+      variant="filled"
+      fullWidth
+      margin="dense"
+      label={props.label}
+      onChange={handleChange}
+    />
+  );
+}
+
+function ArtistPopup(props) {
+  const [isrc, setIsrc] = React.useState("");
+  const [artist, setArtist] = React.useState("");
+  const [title, setTitle] = React.useState("");
+
+  const handleSubmit = () => {
+    props.onSubmit({
+      isrc: isrc,
+      artist: artist,
+      titls: title,
+    });
+  };
+
+  return (
+    <Dialog open={props.open} maxWidth="sm" fullWidth>
+      <DialogTitle>For artists</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Add a new song by filling out this form.
+        </DialogContentText>
+        <form>
+          <ArtistPopupField label="ISRC" setter={setIsrc} />
+          <ArtistPopupField label="Artist" setter={setArtist} />
+          <ArtistPopupField label="Title" setter={setTitle} />
+          <DialogActions>
+            <Button variant="contained" disableElevation color="secondary" onClick={props.onCancel}>
+              Cancel
+            </Button>
+            <Button variant="contained" disableElevation color="primary" onClick={handleSubmit}>
+              Submit
+            </Button>
+          </DialogActions>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      artistOpen: false,
       songs: [],
     };
   }
@@ -67,7 +128,35 @@ class App extends React.Component {
     }
   }
 
+  async saveTrack(data) {
+    try {
+      const res = await fetch(`/api/tracks/${data.isrc}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          artist: data.artist,
+          title: data.title,
+        })
+      });
+      if (res.ok) {
+        this.setArtistOpen(false);
+      } else {
+        const {error} = await res.json();
+        alert(error)
+      }
+    } catch(err) {
+      alert(err.stack)
+    }
+  }
+
+  setArtistOpen(open) {
+    this.setState({ artistOpen: open });
+  }
+
   render() {
+    const artistOpen = () => { this.setArtistOpen(true); };
+    const artistClose = () => { this.setArtistOpen(false); };
+
     return (
       <Container maxWidth="xl" disableGutters>
         <Grid container className="TitleBox">
@@ -102,7 +191,7 @@ class App extends React.Component {
               and streaming distributors to come together with no barriers to
               track the latest trends in music.
             </Typography>
-            <Button variant="contained" color="secondary" size="large">
+            <Button variant="contained" color="secondary" size="large" onClick={artistOpen}>
               For artists
             </Button>
             <Button variant="contained" color="secondary" size="large">
@@ -125,6 +214,11 @@ class App extends React.Component {
             </Typography>
           </Grid>
         </Grid>
+        <ArtistPopup
+          open={this.state.artistOpen}
+          onCancel={artistClose}
+          onSubmit={(data) => this.saveTrack(data)}
+        />
       </Container>
     );
   }
