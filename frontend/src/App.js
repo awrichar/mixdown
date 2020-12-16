@@ -237,8 +237,8 @@ class App extends React.Component {
                 Mixdown
               </Typography>
               <Typography variant="h6">
-                powered by
-                <img src={KaleidoLogo} alt="Kaleido" className="KaleidoLogo" />
+                powered by <Link href="http://kaleido.io">
+                <img src={KaleidoLogo} alt="Kaleido" className="KaleidoLogo" /></Link>
               </Typography>
             </Box>
             <Container className="Subtitle">
