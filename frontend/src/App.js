@@ -12,14 +12,6 @@ import './App.css';
 
 const useStyles = makeStyles((theme) => {
   return {
-    titleBox: {
-      [theme.breakpoints.down('md')]: {
-        height: "275px",
-      },
-      [theme.breakpoints.up('lg')]: {
-        height: "500px",
-      },
-    },
     title: {
       [theme.breakpoints.down('md')]: {
         fontSize: "10vw",
@@ -70,8 +62,8 @@ export default function App() {
   ];
 
   return (
-    <Container maxWidth={false} disableGutters>
-      <Grid container className={`TitleBox ${styles.titleBox}`}>
+    <Container maxWidth="xl" disableGutters>
+      <Grid container className="TitleBox">
           <Grid item xs={12} lg={6}>
             <Box className="Title">
               <Typography variant="h1" className={styles.title}>
@@ -91,7 +83,9 @@ export default function App() {
           <Grid item xs={12} lg={6} className="ChartBox">
             <SongList songs={songs} />
           </Grid>
-          <Grid item xs={6} className="AboutText">
+      </Grid>
+      <Grid container>
+          <Grid item xs={12} lg={6} className="AboutText">
             <Typography variant="h4">
               Stream your tracks. Track your streams.
             </Typography>
@@ -108,7 +102,7 @@ export default function App() {
               For distributors
             </Button>
           </Grid>
-          <Grid item xs={6} className="AboutText">
+          <Grid item xs={12} lg={6} className="AboutText">
             <Typography variant="h4">
               About this site
             </Typography>
