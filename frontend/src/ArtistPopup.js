@@ -32,7 +32,7 @@ export default function ArtistPopup(props) {
     props.onSubmit({
       isrc: isrc,
       artist: artist,
-      titls: title,
+      title: title,
     });
   };
 
