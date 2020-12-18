@@ -51,9 +51,13 @@ export default function DistributorPopup(props) {
       <DialogTitle>For distributors</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Simulate song plays using this form.
-          Select a distributor and enter an <Link
-            href="https://isrc.soundexchange.com">ISRC code</Link> to increment the play count.
+          In a consortium of streaming distributors, each party would be able to
+          increment song plays on the chain.
+        <DialogContentText>
+        </DialogContentText>
+          To simulate, select a distributor and enter an <Link
+            href="https://isrc.soundexchange.com">ISRC</Link> to increment the play
+            count of that song.
         </DialogContentText>
         <form>
           <FormControl variant="filled" fullWidth={true}>
