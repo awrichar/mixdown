@@ -4,7 +4,7 @@
   "description": "Backend for mixdown",
   "main": "backend/index.js",
   "scripts": {
-    "test": "mocha test/*.js test/**/*.js",
+    "test": "mocha --exit backend/test/*.js",
     "start": "node .",
     "heroku-postbuild": "cd frontend && npm install && npm run build"
   },
