@@ -5,29 +5,34 @@ const SpotifyWebApi = require('spotify-web-api-node');
 const bodyparser = require('body-parser');
 const path = require('path')
 
-try {
-  // Read from config.js if it exists
-  var { KALEIDO, SPOTIFY } = require('./config');
-} catch (err) {
-  // Otherwise read from environment
-  var KALEIDO = {
-    ARTIST: {
-      USERNAME: process.env.KALEIDO_ARTIST_USERNAME,
-      PASSWORD: process.env.KALEIDO_ARTIST_PASSWORD,
-      FROM_ADDRESS: process.env.KALEIDO_ARTIST_FROM_ADDRESS,
-    },
-    DISTRIBUTOR: {
-      USERNAME: process.env.KALEIDO_DISTRIBUTOR_USERNAME,
-      PASSWORD: process.env.KALEIDO_DISTRIBUTOR_PASSWORD,
-      FROM_ADDRESS: process.env.KALEIDO_DISTRIBUTOR_FROM_ADDRESS,
-    }
-  };
-  var SPOTIFY = {
-    CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
-    CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET,
-  };
+function readConfig() {
+  try {
+    // Read from config.js if it exists
+    return require('./config');
+  } catch (err) {
+    // Otherwise read from environment
+    return {
+      KALEIDO: {
+        ARTIST: {
+          USERNAME: process.env.KALEIDO_ARTIST_USERNAME,
+          PASSWORD: process.env.KALEIDO_ARTIST_PASSWORD,
+          FROM_ADDRESS: process.env.KALEIDO_ARTIST_FROM_ADDRESS,
+        },
+        DISTRIBUTOR: {
+          USERNAME: process.env.KALEIDO_DISTRIBUTOR_USERNAME,
+          PASSWORD: process.env.KALEIDO_DISTRIBUTOR_PASSWORD,
+          FROM_ADDRESS: process.env.KALEIDO_DISTRIBUTOR_FROM_ADDRESS,
+        }
+      },
+      SPOTIFY: {
+        CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
+        CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET,
+      },
+    };
+  }
 }
 
+const { KALEIDO, SPOTIFY } = readConfig();
 const CONTRACT_URL = "https://u0dwkkmsov-u0mz5xk0j7-connect.us0-aws.kaleido.io/instances/98c020e24a66f419b5c154768a69f2997f1e20e1?openapi";
 const FRONTEND = path.join(__dirname, '../frontend');
 const app = express();
