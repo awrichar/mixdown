@@ -6,8 +6,23 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
+
+function DistributorTextField(props) {
+  const handleChange = event => {
+    props.setter(event.target.value);
+  };
+
+  return (
+    <TextField
+      variant="filled"
+      fullWidth
+      margin="dense"
+      label={props.label}
+      onChange={handleChange}
+    />
+  );
+}
 
 export default function DistributorPopup(props) {
   const [isrc, setIsrc] = React.useState("");
@@ -16,10 +31,6 @@ export default function DistributorPopup(props) {
   const songs = props.songs.map(song =>
     <option key={song.isrc} value={song.isrc}>{song.artist} - {song.title}</option>
   );
-
-  const handleChange = event => {
-    setIsrc(event.target.value);
-  };
 
   const handleSubmit = async () => {
     if (isrc) {
@@ -39,12 +50,7 @@ export default function DistributorPopup(props) {
           Record song plays using this form.
         </DialogContentText>
         <form>
-          <FormControl>
-            <Select native onChange={handleChange} initialValue="">
-              <option key="" value=""></option>
-              {songs}
-            </Select>
-          </FormControl>
+          <DistributorTextField label="ISRC" setter={setIsrc} />
           <DialogActions>
             {waiting && <CircularProgress size={30} />}
             <Button
