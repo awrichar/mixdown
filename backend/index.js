@@ -1,9 +1,7 @@
 const request = require('request-promise-native');
-const express = require('express');
 const Swagger = require('swagger-client');
 const SpotifyWebApi = require('spotify-web-api-node');
-const bodyparser = require('body-parser');
-const path = require('path')
+const server = require('./server');
 
 function readConfig() {
   try {
@@ -34,8 +32,6 @@ function readConfig() {
 
 const { KALEIDO, SPOTIFY } = readConfig();
 const CONTRACT_URL = "https://u0dwkkmsov-u0mz5xk0j7-connect.us0-aws.kaleido.io/instances/98c020e24a66f419b5c154768a69f2997f1e20e1?openapi";
-const FRONTEND = path.join(__dirname, '../frontend');
-const app = express();
 
 class SwaggerClient {
   constructor(username, password, fromAddress, contractUrl) {
@@ -95,65 +91,11 @@ const distributorClient = new SwaggerClient(
   KALEIDO.DISTRIBUTOR.USERNAME, KALEIDO.DISTRIBUTOR.PASSWORD, KALEIDO.DISTRIBUTOR.FROM_ADDRESS, CONTRACT_URL);
 const spotifyClient = new SpotifyClient(
   SPOTIFY.CLIENT_ID, SPOTIFY.CLIENT_SECRET);
-
-app.use(bodyparser.json());
-
-app.get('/api/tracks', async (req, res) => {
-  try {
-    const api = await artistClient.api();
-    let resp = await api.getAllSongs_get({
-      "kld-from": artistClient.fromAddress,
-      "kld-sync": "true"
-    });
-    const tracks = resp.body.tracks.map(isrc => ({isrc: isrc}));
-
-    for (const track of tracks) {
-      resp = await api.getSong_get({
-        "isrc": track.isrc,
-        "kld-from": artistClient.fromAddress,
-        "kld-sync": "true"
-      });
-      track.count = resp.body.count;
-
-      let spotifyResp = await spotifyClient.trackInfo(track.isrc);
-      track.artist = spotifyResp ? spotifyResp.artist : "Unknown";
-      track.title = spotifyResp ? spotifyResp.title : "Unknown";
-    }
-    res.status(200).send(JSON.stringify(tracks));
-  } catch (err) {
-    res.status(500).send({
-      error: `${err.response && JSON.stringify(err.response.body) && err.response.text}\n${err.stack}`
-    });
-  }
-});
-
-app.post('/api/tracks/:isrc/increment', async (req, res) => {
-  try {
-    const api = await distributorClient.api();
-    let postRes = await api.incrementSong_post({
-      body: {
-        isrc: req.params.isrc,
-      },
-      "kld-from": distributorClient.fromAddress,
-      "kld-sync": "true"
-    });
-    res.status(200).send(postRes.body);
-  } catch (err) {
-    res.status(500).send({
-      error: `${err.response && JSON.stringify(err.response.body) && err.response.text}\n${err.stack}`
-    });
-  }
-});
-
-// Serve static files and all other routes from the React frontend app
-app.use(express.static(path.join(FRONTEND, 'build')))
-app.get('*', (req, res) => {
-  res.sendFile(path.join(FRONTEND, 'build/index.html'))
-});
+const mixdown = new server.MixdownServer(artistClient, distributorClient, spotifyClient);
+const app = mixdown.app;
 
 async function init() {
-  const PORT = process.env.PORT || 4000;
-  app.listen(PORT, () => console.log(`Listening on port ${PORT}`))
+  mixdown.start(process.env.PORT || 4000);
 }
 
 init().catch(err => {
@@ -161,6 +103,4 @@ init().catch(err => {
   process.exit(1);
 });
 
-module.exports = {
-  app
-};
+module.exports = { app };
