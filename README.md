@@ -35,8 +35,17 @@ values for Kaleido and Spotify.
 
 ## Running
 
-Run `npm start` and `npm start --prefix frontend/` to start both the backend and
-frontend applications.
+Start the backend:
+```
+npm install
+npm start
+```
+
+Start the frontend:
+```
+npm install --prefix frontend/
+npm start --prefix frontend/
+```
 
 ## Testing
 
