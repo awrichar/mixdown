@@ -190,7 +190,7 @@ class App extends React.Component {
           </Grid>
         </Grid>
         <ArtistPopup
-          open={this.state.artistOpen}
+          open={false}
           onCancel={artistClose}
           onSubmit={(data) => this.saveTrack(data)}
         />
