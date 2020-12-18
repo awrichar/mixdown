@@ -4,11 +4,10 @@ const Swagger = require('swagger-client');
 const SpotifyWebApi = require('spotify-web-api-node');
 const bodyparser = require('body-parser');
 const path = require('path')
-const { Client: Database } = require('pg');
 
 try {
   // Read from config.js if it exists
-  var { KALEIDO, PG, SPOTIFY } = require('./config');
+  var { KALEIDO, SPOTIFY } = require('./config');
 } catch (err) {
   // Otherwise read from environment
   var KALEIDO = {
@@ -23,9 +22,6 @@ try {
       FROM_ADDRESS: process.env.KALEIDO_DISTRIBUTOR_FROM_ADDRESS,
     }
   };
-  var PG = {
-    URL: process.env.DATABASE_URL,
-  };
   var SPOTIFY = {
     CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
     CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET,
@@ -35,7 +31,6 @@ try {
 const CONTRACT_URL = "https://u0dwkkmsov-u0mz5xk0j7-connect.us0-aws.kaleido.io/instances/c91d6df416c55e5df363e38044f1c083a1c6ff8a?openapi";
 const FRONTEND = path.join(__dirname, '../frontend');
 const app = express();
-const db = new Database({ connectionString: PG.URL });
 
 class SwaggerClient {
   constructor(username, password, fromAddress, contractUrl) {
@@ -127,19 +122,6 @@ app.get('/api/tracks', async (req, res) => {
   }
 });
 
-app.put('/api/tracks/:id', async (req, res) => {
-  try {
-    db.query(
-      'INSERT INTO tracks VALUES($1, $2, $3)',
-      [req.params.id, req.body.artist, req.body.title]);
-    res.status(204).send();
-  } catch (err) {
-    res.status(500).send({
-      error: `${err.response && JSON.stringify(err.response.body) && err.response.text}\n${err.stack}`
-    });
-  }
-});
-
 app.post('/api/tracks/:isrc/increment', async (req, res) => {
   try {
     const api = await distributorClient.api();
@@ -164,20 +146,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(FRONTEND, 'build/index.html'))
 });
 
-function initDb() {
-  db.query(
-    'CREATE TABLE IF NOT EXISTS tracks (' +
-      'isrc VARCHAR(12) PRIMARY KEY,' +
-      'artist VARCHAR(255),' +
-      'title VARCHAR(255)' +
-    ')'
-  );
-}
-
 async function init() {
-  db.connect();
-  initDb();
-
   const PORT = process.env.PORT || 4000;
   app.listen(PORT, () => console.log(`Listening on port ${PORT}`))
 }
