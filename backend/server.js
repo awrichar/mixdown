@@ -25,7 +25,7 @@ class MixdownServer {
             "kld-from": artistClient.fromAddress,
             "kld-sync": "true"
           });
-          track.count = resp.body.count;
+          track.count = resp.body.count || 0;
 
           let spotifyResp = await spotifyClient.trackInfo(track.isrc);
           track.artist = spotifyResp ? spotifyResp.artist : "Unknown";
