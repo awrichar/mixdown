@@ -28,7 +28,7 @@ try {
   };
 }
 
-const CONTRACT_URL = "https://u0dwkkmsov-u0mz5xk0j7-connect.us0-aws.kaleido.io/instances/c91d6df416c55e5df363e38044f1c083a1c6ff8a?openapi";
+const CONTRACT_URL = "https://u0dwkkmsov-u0mz5xk0j7-connect.us0-aws.kaleido.io/instances/98c020e24a66f419b5c154768a69f2997f1e20e1?openapi";
 const FRONTEND = path.join(__dirname, '../frontend');
 const app = express();
 
@@ -96,14 +96,14 @@ app.use(bodyparser.json());
 app.get('/api/tracks', async (req, res) => {
   try {
     const api = await artistClient.api();
-    let resp = await api.getAll_get({
+    let resp = await api.getAllSongs_get({
       "kld-from": artistClient.fromAddress,
       "kld-sync": "true"
     });
     const tracks = resp.body.tracks.map(isrc => ({isrc: isrc}));
 
     for (const track of tracks) {
-      resp = await api.get_get({
+      resp = await api.getSong_get({
         "isrc": track.isrc,
         "kld-from": artistClient.fromAddress,
         "kld-sync": "true"
@@ -125,7 +125,7 @@ app.get('/api/tracks', async (req, res) => {
 app.post('/api/tracks/:isrc/increment', async (req, res) => {
   try {
     const api = await distributorClient.api();
-    let postRes = await api.increment_post({
+    let postRes = await api.incrementSong_post({
       body: {
         isrc: req.params.isrc,
       },
