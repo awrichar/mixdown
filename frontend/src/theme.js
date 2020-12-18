@@ -40,6 +40,17 @@ const theme = createMuiTheme({
         color: '#000',
       }
     },
+    MuiList: {
+      root: {
+        color: '#000',
+        cursor: 'default',
+      }
+    },
+    MuiInputBase: {
+      root: {
+        color: '#000',
+      }
+    },
   },
 });
 

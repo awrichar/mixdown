@@ -6,6 +6,10 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import Link from '@material-ui/core/Link';
+import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 
 function DistributorTextField(props) {
@@ -47,9 +51,24 @@ export default function DistributorPopup(props) {
       <DialogTitle>For distributors</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Record song plays using this form.
+          Simulate song plays using this form.
+          Select a distributor and enter an <Link
+            href="https://isrc.soundexchange.com">ISRC code</Link> to increment the play count.
         </DialogContentText>
         <form>
+          <FormControl variant="filled" fullWidth={true}>
+            <InputLabel htmlFor="distributor-select">Distributor</InputLabel>
+            <Select
+              defaultValue="0"
+              inputProps={{
+                id: 'distributor-select',
+              }}
+            >
+              <option value="0">Spotify</option>
+              <option value="1">SoundCloud</option>
+              <option value="2">Amazon Music</option>
+            </Select>
+          </FormControl>
           <DistributorTextField label="ISRC" setter={setIsrc} />
           <DialogActions>
             {waiting && <CircularProgress size={30} />}
