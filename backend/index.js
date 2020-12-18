@@ -1,13 +1,14 @@
 const request = require('request-promise-native');
 const express = require('express');
 const Swagger = require('swagger-client');
+const SpotifyWebApi = require('spotify-web-api-node');
 const bodyparser = require('body-parser');
 const path = require('path')
 const { Client: Database } = require('pg');
 
 try {
   // Read from config.js if it exists
-  var { KALEIDO, PG } = require('./config');
+  var { KALEIDO, PG, SPOTIFY } = require('./config');
 } catch (err) {
   // Otherwise read from environment
   var KALEIDO = {
@@ -24,6 +25,10 @@ try {
   };
   var PG = {
     URL: process.env.DATABASE_URL,
+  };
+  var SPOTIFY = {
+    CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
+    CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET,
   };
 }
 
@@ -48,10 +53,48 @@ class SwaggerClient {
   }
 };
 
+class SpotifyClient {
+  constructor(clientId, clientSecret) {
+    this.token = null;
+    this.expiry = null;
+    this.client = new SpotifyWebApi({
+      clientId: clientId,
+      clientSecret: clientSecret,
+    });
+  }
+
+  async getToken() {
+    if (this.token && Date.now() < this.expiry) {
+      return this.token;
+    }
+    const data = await this.client.clientCredentialsGrant();
+    this.token = data.body['access_token'];
+    this.expiry = Date.now() + ((data.body['expires_in'] - 60) * 1000);
+    return this.token;
+  }
+
+  async api() {
+    this.client.setAccessToken(await this.getToken());
+    return this.client;
+  }
+
+  async trackInfo(isrc) {
+    const api = await this.api();
+    const resp = await api.searchTracks('isrc:' + isrc);
+    const results = resp.body.tracks.items;
+    return (results.length == 0) ? null : {
+      artist: results[0].artists.map(a => a.name).join(', '),
+      title: results[0].name,
+    };
+  }
+}
+
 const artistClient = new SwaggerClient(
   KALEIDO.ARTIST.USERNAME, KALEIDO.ARTIST.PASSWORD, KALEIDO.ARTIST.FROM_ADDRESS, CONTRACT_URL);
 const distributorClient = new SwaggerClient(
   KALEIDO.DISTRIBUTOR.USERNAME, KALEIDO.DISTRIBUTOR.PASSWORD, KALEIDO.DISTRIBUTOR.FROM_ADDRESS, CONTRACT_URL);
+const spotifyClient = new SpotifyClient(
+  SPOTIFY.CLIENT_ID, SPOTIFY.CLIENT_SECRET);
 
 app.use(bodyparser.json());
 
@@ -64,12 +107,16 @@ app.get('/api/tracks', async (req, res) => {
         const api = await artistClient.api();
         const songs = queryRes.rows;
         for (const song of songs) {
-          let postRes = await api.get_get({
+          let kaleidoResp = await api.get_get({
             "id": song.isrc,
             "kld-from": artistClient.fromAddress,
             "kld-sync": "true"
           });
-          song.count = postRes.body.count;
+          song.count = kaleidoResp.body.count;
+
+          let spotifyResp = await spotifyClient.trackInfo(song.isrc);
+          song.artist = spotifyResp ? spotifyResp.artist : "Unknown";
+          song.title = spotifyResp ? spotifyResp.title : "Unknown";
         }
         res.status(200).send(JSON.stringify(songs));
       }
