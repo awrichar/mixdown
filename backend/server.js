@@ -31,10 +31,10 @@ class MixdownServer {
           track.artist = spotifyResp ? spotifyResp.artist : "Unknown";
           track.title = spotifyResp ? spotifyResp.title : "Unknown";
         }
-        res.status(200).send(JSON.stringify(tracks));
+        res.status(200).json(tracks);
       } catch (err) {
-        res.status(500).send({
-          error: `${err.response && JSON.stringify(err.response.body) && err.response.text}\n${err.stack}`
+        res.status(500).json({
+          error: `${err.response && err.response.text}\n${err.stack}`
         });
       }
     });
@@ -51,8 +51,8 @@ class MixdownServer {
         });
         res.status(200).send(postRes.body);
       } catch (err) {
-        res.status(500).send({
-          error: `${err.response && JSON.stringify(err.response.body) && err.response.text}\n${err.stack}`
+        res.status(500).json({
+          error: `${err.response && err.response.text}\n${err.stack}`
         });
       }
     });
