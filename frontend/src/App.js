@@ -1,4 +1,5 @@
 import React from 'react';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
@@ -53,6 +54,7 @@ function SongList(props) {
       <Typography variant="h4">
         Top Tracks
       </Typography>
+      {props.loading && <CircularProgress />}
       <ol>{songs}</ol>
     </Box>
   );
@@ -65,11 +67,13 @@ class App extends React.Component {
       artistOpen: false,
       distributorOpen: false,
       songs: [],
+      loading: true,
     };
   }
 
   async componentDidMount() {
-    this.fetchTracks();
+    await this.fetchTracks();
+    this.setState({ loading: false });
   }
 
   async fetchTracks() {
@@ -152,7 +156,7 @@ class App extends React.Component {
             </Container>
           </Grid>
           <Grid item xs={12} lg={6} className="ChartBox">
-            <SongList songs={this.state.songs} />
+            <SongList songs={this.state.songs} loading={this.state.loading} />
           </Grid>
         </Grid>
         <Grid container>
