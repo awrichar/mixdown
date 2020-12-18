@@ -32,7 +32,7 @@ try {
   };
 }
 
-const CONTRACT_URL = "https://u0dwkkmsov-u0mz5xk0j7-connect.us0-aws.kaleido.io/instances/9e88e4cf43cd9f063c640504bbfb4483a4bb2540?openapi";
+const CONTRACT_URL = "https://u0dwkkmsov-u0mz5xk0j7-connect.us0-aws.kaleido.io/instances/c91d6df416c55e5df363e38044f1c083a1c6ff8a?openapi";
 const FRONTEND = path.join(__dirname, '../frontend');
 const app = express();
 const db = new Database({ connectionString: PG.URL });
@@ -100,27 +100,26 @@ app.use(bodyparser.json());
 
 app.get('/api/tracks', async (req, res) => {
   try {
-    db.query('SELECT * FROM tracks', async (err, queryRes) => {
-      if (err) {
-        res.status(500).send({error: err.stack});
-      } else {
-        const api = await artistClient.api();
-        const songs = queryRes.rows;
-        for (const song of songs) {
-          let kaleidoResp = await api.get_get({
-            "id": song.isrc,
-            "kld-from": artistClient.fromAddress,
-            "kld-sync": "true"
-          });
-          song.count = kaleidoResp.body.count;
-
-          let spotifyResp = await spotifyClient.trackInfo(song.isrc);
-          song.artist = spotifyResp ? spotifyResp.artist : "Unknown";
-          song.title = spotifyResp ? spotifyResp.title : "Unknown";
-        }
-        res.status(200).send(JSON.stringify(songs));
-      }
+    const api = await artistClient.api();
+    let resp = await api.getAll_get({
+      "kld-from": artistClient.fromAddress,
+      "kld-sync": "true"
     });
+    const tracks = resp.body.tracks.map(isrc => ({isrc: isrc}));
+
+    for (const track of tracks) {
+      resp = await api.get_get({
+        "isrc": track.isrc,
+        "kld-from": artistClient.fromAddress,
+        "kld-sync": "true"
+      });
+      track.count = resp.body.count;
+
+      let spotifyResp = await spotifyClient.trackInfo(track.isrc);
+      track.artist = spotifyResp ? spotifyResp.artist : "Unknown";
+      track.title = spotifyResp ? spotifyResp.title : "Unknown";
+    }
+    res.status(200).send(JSON.stringify(tracks));
   } catch (err) {
     res.status(500).send({
       error: `${err.response && JSON.stringify(err.response.body) && err.response.text}\n${err.stack}`
@@ -141,12 +140,12 @@ app.put('/api/tracks/:id', async (req, res) => {
   }
 });
 
-app.post('/api/tracks/:id/increment', async (req, res) => {
+app.post('/api/tracks/:isrc/increment', async (req, res) => {
   try {
     const api = await distributorClient.api();
     let postRes = await api.increment_post({
       body: {
-        id: req.params.id,
+        isrc: req.params.isrc,
       },
       "kld-from": distributorClient.fromAddress,
       "kld-sync": "true"
