@@ -6,15 +6,15 @@ const path = require('path');
 const FRONTEND = path.join(__dirname, '../frontend');
 
 class MixdownServer {
-  constructor(artistClient, distributorClient, spotifyClient) {
+  constructor(viewerClient, distributorClient, spotifyClient) {
     this.app = express();
     this.app.use(bodyparser.json());
 
     this.app.get('/api/tracks', async (req, res) => {
       try {
-        const api = await artistClient.api();
+        const api = await viewerClient.api();
         let resp = await api.getAllSongs_get({
-          "kld-from": artistClient.fromAddress,
+          "kld-from": viewerClient.fromAddress,
           "kld-sync": "true"
         });
         const tracks = resp.body.tracks.map(isrc => ({isrc: isrc}));
@@ -22,7 +22,7 @@ class MixdownServer {
         for (const track of tracks) {
           resp = await api.getSong_get({
             "isrc": track.isrc,
-            "kld-from": artistClient.fromAddress,
+            "kld-from": viewerClient.fromAddress,
             "kld-sync": "true"
           });
           track.count = resp.body.count || 0;

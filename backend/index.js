@@ -11,34 +11,32 @@ function readConfig() {
     // Otherwise read from environment
     return {
       KALEIDO: {
-        ARTIST: {
-          USERNAME: process.env.KALEIDO_ARTIST_USERNAME,
-          PASSWORD: process.env.KALEIDO_ARTIST_PASSWORD,
-          FROM_ADDRESS: process.env.KALEIDO_ARTIST_FROM_ADDRESS,
+        contractUrl: process.env.KALEIDO_CONTRACT_URL,
+        viewer: {
+          auth: process.env.KALEIDO_VIEWER_AUTH,
+          address: process.env.KALEIDO_VIEWER_ADDRESS,
         },
-        DISTRIBUTOR: {
-          USERNAME: process.env.KALEIDO_DISTRIBUTOR_USERNAME,
-          PASSWORD: process.env.KALEIDO_DISTRIBUTOR_PASSWORD,
-          FROM_ADDRESS: process.env.KALEIDO_DISTRIBUTOR_FROM_ADDRESS,
+        distributor: {
+          auth: process.env.KALEIDO_DISTRIBUTOR_AUTH,
+          address: process.env.KALEIDO_DISTRIBUTOR_ADDRESS,
         }
       },
       SPOTIFY: {
-        CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
-        CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET,
+        clientId: process.env.SPOTIFY_CLIENT_ID,
+        clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
       },
     };
   }
 }
 
 const { KALEIDO, SPOTIFY } = readConfig();
-const CONTRACT_URL = "https://u0dwkkmsov-u0mz5xk0j7-connect.us0-aws.kaleido.io/instances/98c020e24a66f419b5c154768a69f2997f1e20e1?openapi";
 
 class SwaggerClient {
-  constructor(username, password, fromAddress, contractUrl) {
+  constructor(auth, fromAddress, contractUrl) {
     this.fromAddress = fromAddress;
     this.client = Swagger(contractUrl, {
       requestInterceptor: req => {
-        req.headers.authorization = `Basic ${Buffer.from(`${username}:${password}`).toString("base64")}`;
+        req.headers.authorization = `Basic ${Buffer.from(`${auth}`).toString("base64")}`;
       }
     });
   }
@@ -85,13 +83,10 @@ class SpotifyClient {
   }
 }
 
-const artistClient = new SwaggerClient(
-  KALEIDO.ARTIST.USERNAME, KALEIDO.ARTIST.PASSWORD, KALEIDO.ARTIST.FROM_ADDRESS, CONTRACT_URL);
-const distributorClient = new SwaggerClient(
-  KALEIDO.DISTRIBUTOR.USERNAME, KALEIDO.DISTRIBUTOR.PASSWORD, KALEIDO.DISTRIBUTOR.FROM_ADDRESS, CONTRACT_URL);
-const spotifyClient = new SpotifyClient(
-  SPOTIFY.CLIENT_ID, SPOTIFY.CLIENT_SECRET);
-const mixdown = new server.MixdownServer(artistClient, distributorClient, spotifyClient);
+const viewerClient = new SwaggerClient(KALEIDO.viewer.auth, KALEIDO.viewer.address, KALEIDO.contractUrl);
+const distributorClient = new SwaggerClient(KALEIDO.distributor.auth, KALEIDO.distributor.address, KALEIDO.contractUrl);
+const spotifyClient = new SpotifyClient(SPOTIFY.clientId, SPOTIFY.clientSecret);
+const mixdown = new server.MixdownServer(viewerClient, distributorClient, spotifyClient);
 const app = mixdown.app;
 
 async function init() {

@@ -31,20 +31,20 @@ class FakeSpotifyClient {
 }
 
 describe('Tracks API', () => {
-  let artistClient = new FakeSwaggerClient();
+  let viewerClient = new FakeSwaggerClient();
   let distributorClient = new FakeSwaggerClient();
   let spotifyClient = new FakeSpotifyClient();
-  let mixdown = new server.MixdownServer(artistClient, distributorClient, spotifyClient);
+  let mixdown = new server.MixdownServer(viewerClient, distributorClient, spotifyClient);
   let app = mixdown.app;
 
   afterEach(() => {
-    artistClient.reset();
+    viewerClient.reset();
     distributorClient.reset();
     spotifyClient.reset();
   })
 
   it('should handle empty list', (done) => {
-    artistClient.api().getAllSongs_get = sinon.fake.returns({
+    viewerClient.api().getAllSongs_get = sinon.fake.returns({
       body: {
         tracks: []
       },
@@ -61,11 +61,11 @@ describe('Tracks API', () => {
   });
 
   it('should handle unknown play count', (done) => {
-    artistClient.api().getAllSongs_get = sinon.fake.returns({
+    viewerClient.api().getAllSongs_get = sinon.fake.returns({
       body: { tracks: ['ABC'] },
     });
 
-    artistClient.api().getSong_get = sinon.fake.returns({
+    viewerClient.api().getSong_get = sinon.fake.returns({
       body: {},
     });
 
@@ -90,11 +90,11 @@ describe('Tracks API', () => {
   });
 
   it('should handle unknown metadata', (done) => {
-    artistClient.api().getAllSongs_get = sinon.fake.returns({
+    viewerClient.api().getAllSongs_get = sinon.fake.returns({
       body: { tracks: ['ABC'] },
     });
 
-    artistClient.api().getSong_get = sinon.fake.returns({
+    viewerClient.api().getSong_get = sinon.fake.returns({
       body: { count: 1 },
     });
 
@@ -114,12 +114,12 @@ describe('Tracks API', () => {
   });
 
   it('should handle multiple tracks', (done) => {
-    artistClient.api().getAllSongs_get = sinon.fake.returns({
+    viewerClient.api().getAllSongs_get = sinon.fake.returns({
       body: { tracks: ['ABC', 'XYZ'] },
     });
 
     let getSong = sinon.stub();
-    artistClient.api().getSong_get = getSong;
+    viewerClient.api().getSong_get = getSong;
     getSong.onCall(0).returns({
       body: { count: 2 },
     });
