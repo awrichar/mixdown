@@ -1,6 +1,9 @@
 # mixdown
 Music billboards powered by blockchain.
 
+Built with <a href="https://nodejs.org">Node.js</a>, <a href="https://reactjs.org">React</a>,
+<a href="https://developer.spotify.com/">Spotify</a>, and <a href="http://kaleido.io">Kaleido</a>.
+
 ## Live Demo
 
 View the demo at http://mixdown.herokuapp.com
