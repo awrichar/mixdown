@@ -49,4 +49,8 @@ npm start --prefix frontend/
 
 ## Testing
 
-Run `npm test` to execute unit tests.
+Run the unit tests:
+```
+npm install -D
+npm test
+```
