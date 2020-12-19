@@ -186,10 +186,16 @@ class App extends React.Component {
             </Typography>
             <br />
             <Typography>
-              Created by&nbsp;
-              <Link href="http://arichardson.co" color="secondary" underline="always">
-                Andrew Richardson
-              </Link>.
+              Created by <Link
+                href="http://arichardson.co"
+                color="secondary"
+                underline="always"
+              >Andrew Richardson</Link>.
+              Source code on <Link
+                href="https://github.com/awrichar/mixdown"
+                color="secondary"
+                underline="always"
+              >GitHub</Link>.
             </Typography>
           </Grid>
         </Grid>
